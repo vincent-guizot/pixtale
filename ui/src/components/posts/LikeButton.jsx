@@ -1,5 +1,8 @@
+'use client';
+
 import { useState } from 'react';
 import { Heart } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { likesApi } from '@/api/likes.api';
@@ -44,17 +47,25 @@ export function LikeButton({
   };
 
   return (
-    <button
+    <motion.button
+      type="button"
+      whileTap={{ scale: 0.85 }}
+      whileHover={{ scale: 1.1 }}
       onClick={handleClick}
       disabled={loading}
       aria-label={liked ? 'Unlike' : 'Like'}
       className="cursor-pointer disabled:opacity-50"
     >
-      <Heart
-        className={cn(size === 'lg' ? 'h-7 w-7' : 'h-6 w-6', 'transition-colors')}
-        fill={liked ? '#f66b0e' : 'none'}
-        stroke={liked ? '#f66b0e' : 'currentColor'}
-      />
-    </button>
+      <motion.div
+        animate={liked ? { scale: [1, 1.35, 0.95, 1] } : { scale: 1 }}
+        transition={{ duration: 0.3, ease: 'easeOut' }}
+      >
+        <Heart
+          className={cn(size === 'lg' ? 'h-7 w-7' : 'h-6 w-6', 'transition-colors')}
+          fill={liked ? '#f66b0e' : 'none'}
+          stroke={liked ? '#f66b0e' : 'currentColor'}
+        />
+      </motion.div>
+    </motion.button>
   );
 }

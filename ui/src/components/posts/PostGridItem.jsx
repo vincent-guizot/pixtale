@@ -1,13 +1,20 @@
+'use client';
+
 import { Play } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { usePostModalStore } from '@/stores/postModalStore';
 
 export function PostGridItem({ post }) {
   const openPost = usePostModalStore((s) => s.openPost);
 
   return (
-    <button
+    <motion.button
+      type="button"
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ duration: 0.2 }}
       onClick={() => openPost(post.id)}
-      className="group relative aspect-square w-full overflow-hidden rounded-lg bg-gray-100 cursor-pointer"
+      className="group relative aspect-square w-full overflow-hidden rounded-lg bg-gray-100 cursor-pointer shadow-xs"
     >
       {post.imageUrl ? (
         <img
@@ -22,9 +29,9 @@ export function PostGridItem({ post }) {
       )}
       <div className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all group-hover:bg-black/20 group-hover:opacity-100">
         <div className="flex items-center gap-1 rounded-full bg-black/50 px-3 py-1.5 text-xs font-semibold text-white">
-          <Play className="h-3.5 w-3.5 fill-white" /> {post.likesCount} likes
+          <Play className="h-3.5 w-3.5 fill-white" /> {post.likesCount ?? 0} likes
         </div>
       </div>
-    </button>
+    </motion.button>
   );
 }

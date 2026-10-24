@@ -3,6 +3,7 @@
 import { Heart, MessageCircle, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { usePostModalStore } from '@/stores/postModalStore';
 import { getInitials, timeAgo, cn } from '@/lib/utils';
@@ -37,7 +38,10 @@ export function NotificationItem({ notification, onRead }) {
   };
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, x: -8 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.2 }}
       role="button"
       tabIndex={0}
       onClick={handleClickItem}
@@ -100,6 +104,6 @@ export function NotificationItem({ notification, onRead }) {
       {!notification.isRead && (
         <span className="h-2 w-2 rounded-full bg-[var(--color-orange)] shrink-0" />
       )}
-    </div>
+    </motion.div>
   );
 }

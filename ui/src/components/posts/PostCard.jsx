@@ -3,6 +3,7 @@
 import { MessageCircle, MoreHorizontal, Send, Trash2, Pencil } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -41,7 +42,12 @@ export function PostCard({ post }) {
   };
 
   return (
-    <article className="mb-6 rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-sm">
+    <motion.article
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: 'easeOut' }}
+      className="mb-6 rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+    >
       <div className="flex items-center justify-between px-4 py-3">
         <Link href={`/users/${post.User?.username}`} className="flex items-center gap-3 hover:opacity-85 transition-opacity">
           <Avatar className="h-10 w-10">
@@ -74,13 +80,13 @@ export function PostCard({ post }) {
       </div>
 
       <div
-        className="bg-black flex items-center justify-center cursor-pointer max-h-[500px] overflow-hidden"
+        className="bg-black flex items-center justify-center cursor-pointer max-h-[500px] overflow-hidden group"
         onClick={() => openPost(post.id)}
       >
         <img
           src={post.imageUrl}
           alt={post.caption}
-          className="w-full object-cover max-h-[500px]"
+          className="w-full object-cover max-h-[500px] transition-transform duration-300 group-hover:scale-[1.01]"
           loading="lazy"
         />
       </div>
@@ -89,20 +95,22 @@ export function PostCard({ post }) {
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-4">
             <LikeButton postId={post.id} initialLiked={post.isLiked} />
-            <button
+            <motion.button
+              whileTap={{ scale: 0.85 }}
               onClick={() => openPost(post.id)}
               className="text-[var(--color-navy)] hover:opacity-70 transition-opacity cursor-pointer"
               aria-label="View comments"
             >
               <MessageCircle className="h-6 w-6" />
-            </button>
-            <button
+            </motion.button>
+            <motion.button
+              whileTap={{ scale: 0.85 }}
               onClick={handleShare}
               className="text-[var(--color-navy)] hover:opacity-70 transition-opacity cursor-pointer"
               aria-label="Share post"
             >
               <Send className="h-6 w-6" />
-            </button>
+            </motion.button>
           </div>
 
           {post.Category && (
@@ -130,6 +138,6 @@ export function PostCard({ post }) {
           Lihat semua komentar
         </button>
       </div>
-    </article>
+    </motion.article>
   );
 }
