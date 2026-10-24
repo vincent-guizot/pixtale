@@ -24,7 +24,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-[var(--color-navy)] px-4">
       <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-xl">
         <div className="flex justify-center mb-6">
-          <Logo />
+          <Logo size="lg" />
         </div>
         <h1 className="text-xl font-bold text-center text-[var(--color-navy)]">Welcome back</h1>
         <p className="text-sm text-center text-gray-400 mt-1 mb-6">Login to keep sharing your moments</p>
