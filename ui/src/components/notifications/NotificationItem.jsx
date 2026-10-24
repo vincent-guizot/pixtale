@@ -1,11 +1,14 @@
+'use client';
+
 import { Heart, MessageCircle, UserPlus } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { usePostModalStore } from '@/stores/postModalStore';
 import { getInitials, timeAgo, cn } from '@/lib/utils';
 
 export function NotificationItem({ notification, onRead }) {
-  const navigate = useNavigate();
+  const router = useRouter();
   const openPost = usePostModalStore((state) => state.openPost);
 
   const isLike = notification.type === 'like';
@@ -20,7 +23,7 @@ export function NotificationItem({ notification, onRead }) {
     }
 
     if (isFollow && username) {
-      navigate(`/users/${username}`);
+      router.push(`/users/${username}`);
     } else if (notification.postId) {
       openPost(notification.postId);
     }
@@ -50,58 +53,53 @@ export function NotificationItem({ notification, onRead }) {
       )}
     >
       <div className="relative shrink-0">
-        {username ? (
-          <Link
-            to={`/users/${username}`}
-            onClick={handleClickUser}
-            className="block hover:opacity-85 transition-opacity"
-          >
-            <Avatar className="h-11 w-11">
-              <AvatarImage src={undefined} alt={username} />
-              <AvatarFallback>{getInitials(username)}</AvatarFallback>
-            </Avatar>
-          </Link>
-        ) : (
+        <Link href={username ? `/users/${username}` : '#'} onClick={handleClickUser}>
           <Avatar className="h-11 w-11">
-            <AvatarImage src={undefined} alt="User" />
-            <AvatarFallback>?</AvatarFallback>
+            <AvatarImage src={undefined} alt={username} />
+            <AvatarFallback>{username ? getInitials(username) : '?'}</AvatarFallback>
           </Avatar>
-        )}
+        </Link>
         <span
           className={cn(
-            'absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white',
+            'absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-white',
             isLike && 'bg-red-500',
             isComment && 'bg-blue-500',
-            isFollow && 'bg-emerald-500'
+            isFollow && 'bg-[var(--color-orange)]'
           )}
         >
-          {isLike && <Heart className="h-2.5 w-2.5 fill-white text-white" />}
-          {isComment && <MessageCircle className="h-2.5 w-2.5 fill-white text-white" />}
-          {isFollow && <UserPlus className="h-2.5 w-2.5 text-white" />}
+          {isLike && <Heart className="h-3 w-3 fill-current" />}
+          {isComment && <MessageCircle className="h-3 w-3 fill-current" />}
+          {isFollow && <UserPlus className="h-3 w-3" />}
         </span>
       </div>
 
-      <div className="flex-1 min-w-0">
-        <p className="text-sm text-[var(--color-navy)]">
-          {username ? (
-            <Link
-              to={`/users/${username}`}
-              onClick={handleClickUser}
-              className="font-semibold hover:underline"
-            >
-              {username}
-            </Link>
-          ) : (
-            <span className="font-semibold">Someone</span>
-          )}{' '}
-          {isLike && 'liked your post.'}
-          {isComment && 'commented on your post.'}
-          {isFollow && 'started following you.'}
+      <div className="flex-1 min-w-0 text-sm">
+        <p className="text-[var(--color-navy)] leading-snug">
+          <Link
+            href={username ? `/users/${username}` : '#'}
+            onClick={handleClickUser}
+            className="font-semibold hover:underline mr-1"
+          >
+            {username || 'Seseorang'}
+          </Link>
+          {isLike && 'menyukai postingan Anda.'}
+          {isComment && 'mengomentari postingan Anda.'}
+          {isFollow && 'mulai mengikuti Anda.'}
         </p>
-        <p className="text-xs text-gray-400 mt-0.5">{timeAgo(notification.createdAt)} ago</p>
+        <p className="text-xs text-gray-400 mt-0.5">{timeAgo(notification.createdAt)} yang lalu</p>
       </div>
 
-      {!notification.isRead && <span className="h-2 w-2 shrink-0 rounded-full bg-[var(--color-orange)]" />}
+      {notification.post?.imageUrl && !isFollow && (
+        <img
+          src={notification.post.imageUrl}
+          alt="Post thumbnail"
+          className="h-11 w-11 rounded-lg object-cover shrink-0 border border-gray-100"
+        />
+      )}
+
+      {!notification.isRead && (
+        <span className="h-2 w-2 rounded-full bg-[var(--color-orange)] shrink-0" />
+      )}
     </div>
   );
 }

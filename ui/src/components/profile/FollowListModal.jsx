@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom';
+'use client';
+
+import Link from 'next/link';
 import { UserCheck, UserPlus } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -50,51 +52,53 @@ export function FollowListModal({ open, onOpenChange, userId, type }) {
               ))}
             </div>
           ) : users.length === 0 ? (
-            <div className="py-8 text-center text-sm text-gray-400">
-              {isFollowers ? 'Belum memiliki pengikut.' : 'Belum mengikuti siapa pun.'}
-            </div>
+            <p className="py-8 text-center text-sm text-gray-500">
+              Belum ada {title.toLowerCase()}.
+            </p>
           ) : (
-            <div className="divide-y divide-gray-100 max-h-[60vh] overflow-y-auto pr-1">
-              {users.map((targetUser) => {
-                const profile = targetUser.Profile || {};
-                const isSelf = currentUser && currentUser.id === targetUser.id;
+            <div className="max-h-80 overflow-y-auto space-y-3 pr-1">
+              {users.map((u) => {
+                const isSelf = currentUser && currentUser.id === u.id;
+                const isFollowingUser = Boolean(u.isFollowing);
 
                 return (
-                  <div key={targetUser.id} className="flex items-center justify-between py-2.5">
+                  <div key={u.id} className="flex items-center justify-between py-1">
                     <Link
-                      to={`/users/${targetUser.username}`}
+                      href={`/users/${u.username}`}
                       onClick={() => onOpenChange(false)}
-                      className="flex items-center gap-3 hover:opacity-80 transition-opacity min-w-0"
+                      className="flex items-center gap-3 hover:opacity-80 transition-opacity"
                     >
-                      <Avatar className="h-10 w-10 shrink-0">
-                        <AvatarImage src={profile.avatarUrl || undefined} alt={targetUser.username} />
-                        <AvatarFallback>{getInitials(targetUser.username)}</AvatarFallback>
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={undefined} alt={u.username} />
+                        <AvatarFallback>{getInitials(u.username)}</AvatarFallback>
                       </Avatar>
-                      <div className="min-w-0 truncate">
-                        <p className="text-sm font-semibold text-[var(--color-navy)] truncate">
-                          {targetUser.username}
+                      <div>
+                        <p className="text-sm font-semibold text-[var(--color-navy)] leading-tight">
+                          {u.username}
                         </p>
-                        {profile.fullName && (
-                          <p className="text-xs text-gray-400 truncate">{profile.fullName}</p>
-                        )}
+                        <p className="text-xs text-gray-400 leading-tight">@{u.username}</p>
                       </div>
                     </Link>
 
-                    {!isSelf && (
+                    {!isSelf && currentUser && (
                       <Button
                         size="sm"
-                        variant={targetUser.isFollowing ? 'outline' : 'default'}
-                        onClick={() => handleToggle(targetUser.id)}
+                        variant={isFollowingUser ? 'outline' : 'default'}
+                        onClick={() => handleToggle(u.id)}
                         disabled={toggleFollowMutation.isPending}
-                        className="ml-2 shrink-0 h-8 text-xs"
+                        className={
+                          isFollowingUser
+                            ? 'border-gray-300 text-gray-700 hover:bg-gray-50 h-8 px-3'
+                            : 'bg-[var(--color-orange)] hover:bg-[var(--color-orange-hover)] text-white h-8 px-3'
+                        }
                       >
-                        {targetUser.isFollowing ? (
+                        {isFollowingUser ? (
                           <>
-                            <UserCheck className="h-3.5 w-3.5 mr-1" /> Following
+                            <UserCheck className="mr-1.5 h-3.5 w-3.5" /> Mengikuti
                           </>
                         ) : (
                           <>
-                            <UserPlus className="h-3.5 w-3.5 mr-1" /> Follow
+                            <UserPlus className="mr-1.5 h-3.5 w-3.5" /> Ikuti
                           </>
                         )}
                       </Button>

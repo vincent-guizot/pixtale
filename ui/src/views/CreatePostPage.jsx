@@ -1,7 +1,9 @@
+'use client';
+
 import { useEffect, useState, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useRouter, useParams } from 'next/navigation';
 import { SendHorizonal, X, ImageIcon, Upload, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createPostSchema } from '@/schemas/post.schema';
@@ -21,9 +23,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 const CAPTION_MAX = 2200;
 
 export default function CreatePostPage() {
-  const { id } = useParams();
+  const params = useParams();
+  const id = params?.id;
   const isEditMode = !!id;
-  const navigate = useNavigate();
+  const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const fileInputRef = useRef(null);
 
@@ -58,10 +61,10 @@ export default function CreatePostPage() {
       const isAdmin = user.role === 'admin';
       if (!isOwner && !isAdmin) {
         toast.error('Anda tidak memiliki izin untuk mengedit post ini');
-        navigate('/', { replace: true });
+        router.replace('/');
       }
     }
-  }, [isEditMode, existingPost, user, navigate]);
+  }, [isEditMode, existingPost, user, router]);
 
   // Isi ulang form kalau lagi mode edit dan data post-nya sudah terbaca
   useEffect(() => {
@@ -108,9 +111,9 @@ export default function CreatePostPage() {
     };
 
     if (isEditMode && id) {
-      updatePost.mutate(payload, { onSuccess: () => navigate('/') });
+      updatePost.mutate(payload, { onSuccess: () => router.push('/') });
     } else {
-      createPost.mutate(payload, { onSuccess: () => navigate('/') });
+      createPost.mutate(payload, { onSuccess: () => router.push('/') });
     }
   });
 
@@ -137,7 +140,7 @@ export default function CreatePostPage() {
       <form onSubmit={onSubmit} className="rounded-2xl border border-gray-200 bg-white p-6 space-y-6">
         <div className="space-y-3">
           <Label>Foto / Gambar</Label>
-          
+
           {/* Hidden file input untuk Multer upload */}
           <input
             ref={fileInputRef}

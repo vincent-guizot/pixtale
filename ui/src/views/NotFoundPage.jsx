@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom';
+'use client';
+
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
 export default function NotFoundPage() {
@@ -7,7 +9,7 @@ export default function NotFoundPage() {
       <h1 className="text-6xl font-bold text-[var(--color-orange)]">404</h1>
       <p className="text-gray-500">Halaman yang kamu cari nggak ketemu.</p>
       <Button asChild>
-        <Link to="/">Balik ke Home</Link>
+        <Link href="/">Balik ke Home</Link>
       </Button>
     </div>
   );

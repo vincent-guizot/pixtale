@@ -1,5 +1,7 @@
+'use client';
+
 import { Trash2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuthStore } from '@/stores/authStore';
 import { usePostModalStore } from '@/stores/postModalStore';
@@ -14,7 +16,7 @@ export function CommentItem({ comment, onDelete }) {
   return (
     <div className="flex items-start gap-3 py-2 group">
       <Link
-        to={username ? `/users/${username}` : '#'}
+        href={username ? `/users/${username}` : '#'}
         onClick={() => {
           if (username) closePost();
         }}
@@ -28,7 +30,7 @@ export function CommentItem({ comment, onDelete }) {
       <div className="flex-1 min-w-0">
         <p className="text-sm text-[var(--color-navy)]">
           <Link
-            to={username ? `/users/${username}` : '#'}
+            href={username ? `/users/${username}` : '#'}
             onClick={() => {
               if (username) closePost();
             }}

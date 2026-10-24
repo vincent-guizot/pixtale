@@ -1,5 +1,7 @@
+'use client';
+
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { ImagePlus, Users, Compass, UserPlus } from 'lucide-react';
 import { usePosts } from '@/hooks/usePosts';
 import { useSuggestions, useToggleFollow } from '@/hooks/useFollow';
@@ -52,7 +54,7 @@ export default function HomePage() {
 
       {/* Quick composer */}
       <Link
-        to="/create"
+        href="/create"
         className="mb-6 flex items-center gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-3 hover:bg-gray-50 transition-colors"
       >
         <Avatar className="h-9 w-9">
@@ -107,7 +109,7 @@ export default function HomePage() {
                 Lihat Feed For You
               </Button>
               <Button size="sm" asChild>
-                <Link to="/explore">
+                <Link href="/explore">
                   <Compass className="h-4 w-4 mr-1.5" /> Jelajahi Explore
                 </Link>
               </Button>
@@ -129,7 +131,7 @@ export default function HomePage() {
                       className="flex items-center justify-between py-3"
                     >
                       <Link
-                        to={`/users/${suggestedUser.username}`}
+                        href={`/users/${suggestedUser.username}`}
                         className="flex items-center gap-3 hover:opacity-85 transition-opacity min-w-0"
                       >
                         <Avatar className="h-10 w-10 shrink-0">

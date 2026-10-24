@@ -1,5 +1,7 @@
+'use client';
+
 import { Home, Search, SendHorizonal, Heart } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Logo } from './Logo';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -22,15 +24,14 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-gray-200 bg-white">
-      {/* 3 kolom: Logo | Nav (benar-benar center, seperti Instagram) | Avatar */}
       <div className="mx-auto grid h-16 max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-4">
         <Logo />
 
         <nav className="flex items-center gap-1 justify-self-center sm:gap-2">
-          <IconLink to="/" icon={Home} label="Home" />
-          <IconLink to="/explore" icon={Search} label="Explore" />
-          <IconLink to="/create" icon={SendHorizonal} label="Create post" />
-          <IconLink to="/notifications" icon={Heart} label="Notifications" badge={unreadCount} />
+          <IconLink href="/" icon={Home} label="Home" />
+          <IconLink href="/explore" icon={Search} label="Explore" />
+          <IconLink href="/create" icon={SendHorizonal} label="Create post" />
+          <IconLink href="/notifications" icon={Heart} label="Notifications" badge={unreadCount} />
         </nav>
 
         <div className="justify-self-end">
@@ -48,10 +49,12 @@ export function Header() {
               </div>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to="/profile">Profile</Link>
+                <Link href="/profile" className="cursor-pointer">
+                  Profil Saya
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={logout} className="text-red-500">
+              <DropdownMenuItem onClick={logout} className="text-red-600 cursor-pointer">
                 Logout
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -62,20 +65,21 @@ export function Header() {
   );
 }
 
-function IconLink({ to, icon: Icon, label, badge, className }) {
+function IconLink({ href, to, icon: Icon, label, badge = 0 }) {
+  const target = href || to;
   return (
     <Link
-      to={to}
+      href={target}
       aria-label={label}
       className={cn(
-        'relative flex h-10 w-10 items-center justify-center rounded-full text-[var(--color-navy)] hover:bg-gray-100 transition-colors',
-        className
+        'relative flex h-10 w-10 items-center justify-center rounded-xl text-[var(--color-navy)]',
+        'hover:bg-gray-100 transition-colors'
       )}
     >
       <Icon className="h-5 w-5" />
-      {!!badge && (
-        <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--color-orange)] px-1 text-[10px] font-bold text-white">
-          {badge > 9 ? '9+' : badge}
+      {badge > 0 && (
+        <span className="absolute top-1.5 right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--color-orange)] px-1 text-[10px] font-bold text-white">
+          {badge > 99 ? '99+' : badge}
         </span>
       )}
     </Link>

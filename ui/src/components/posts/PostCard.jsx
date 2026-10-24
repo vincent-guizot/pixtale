@@ -1,5 +1,8 @@
+'use client';
+
 import { MessageCircle, MoreHorizontal, Send, Trash2, Pencil } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -17,7 +20,7 @@ import { getInitials } from '@/lib/utils';
 export function PostCard({ post }) {
   const openPost = usePostModalStore((s) => s.openPost);
   const user = useAuthStore((s) => s.user);
-  const navigate = useNavigate();
+  const router = useRouter();
   const deletePost = useDeletePost();
 
   const isOwner = user?.id === post.userId;
@@ -31,14 +34,16 @@ export function PostCard({ post }) {
 
   const handleShare = (e) => {
     e.stopPropagation();
-    navigator.clipboard.writeText(`${window.location.origin}/?post=${post.id}`);
-    toast.success('Link post disalin ke clipboard');
+    if (typeof window !== 'undefined') {
+      navigator.clipboard.writeText(`${window.location.origin}/?post=${post.id}`);
+      toast.success('Link post disalin ke clipboard');
+    }
   };
 
   return (
-    <article className="mb-6 rounded-2xl border border-gray-200 bg-white overflow-hidden">
+    <article className="mb-6 rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-sm">
       <div className="flex items-center justify-between px-4 py-3">
-        <Link to={`/users/${post.User?.username}`} className="flex items-center gap-3 hover:opacity-85 transition-opacity">
+        <Link href={`/users/${post.User?.username}`} className="flex items-center gap-3 hover:opacity-85 transition-opacity">
           <Avatar className="h-10 w-10">
             <AvatarImage src={undefined} alt={post.User?.username} />
             <AvatarFallback>{post.User ? getInitials(post.User.username) : '?'}</AvatarFallback>
@@ -51,52 +56,77 @@ export function PostCard({ post }) {
 
         {(isOwner || isAdmin) && (
           <DropdownMenu>
-            <DropdownMenuTrigger className="cursor-pointer rounded-full p-1.5 hover:bg-gray-100">
-              <MoreHorizontal className="h-5 w-5 text-gray-500" />
+            <DropdownMenuTrigger className="p-1 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 cursor-pointer">
+              <MoreHorizontal className="h-5 w-5" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               {isOwner && (
-                <DropdownMenuItem onClick={() => navigate(`/posts/${post.id}/edit`)}>
-                  <Pencil className="h-4 w-4" /> Edit post
+                <DropdownMenuItem onClick={() => router.push(`/posts/${post.id}/edit`)}>
+                  <Pencil className="h-4 w-4 mr-2" /> Edit post
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem onClick={handleDelete} className="text-red-500">
-                <Trash2 className="h-4 w-4" /> Delete post
+              <DropdownMenuItem onClick={handleDelete} className="text-red-600">
+                <Trash2 className="h-4 w-4 mr-2" /> Hapus post
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         )}
       </div>
 
-      {post.imageUrl && (
-        <button onClick={() => openPost(post.id)} className="block w-full cursor-pointer">
-          <img src={post.imageUrl} alt={post.caption ?? 'Post image'} className="aspect-square w-full object-cover" />
-        </button>
-      )}
+      <div
+        className="bg-black flex items-center justify-center cursor-pointer max-h-[500px] overflow-hidden"
+        onClick={() => openPost(post.id)}
+      >
+        <img
+          src={post.imageUrl}
+          alt={post.caption}
+          className="w-full object-cover max-h-[500px]"
+          loading="lazy"
+        />
+      </div>
 
-      <div className="px-4 pt-3 pb-4">
-        <div className="flex items-center gap-4">
-          <LikeButton postId={post.id} initialLiked={Boolean(post.isLiked)} />
-          <button onClick={() => openPost(post.id)} className="cursor-pointer">
-            <MessageCircle className="h-6 w-6" />
-          </button>
-          <button onClick={handleShare} className="cursor-pointer">
-            <Send className="h-6 w-6" />
-          </button>
+      <div className="p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-4">
+            <LikeButton postId={post.id} initialLiked={post.isLiked} />
+            <button
+              onClick={() => openPost(post.id)}
+              className="text-[var(--color-navy)] hover:opacity-70 transition-opacity cursor-pointer"
+              aria-label="View comments"
+            >
+              <MessageCircle className="h-6 w-6" />
+            </button>
+            <button
+              onClick={handleShare}
+              className="text-[var(--color-navy)] hover:opacity-70 transition-opacity cursor-pointer"
+              aria-label="Share post"
+            >
+              <Send className="h-6 w-6" />
+            </button>
+          </div>
+
+          {post.Category && (
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[var(--color-blue)]/10 text-[var(--color-blue)]">
+              {post.Category.name}
+            </span>
+          )}
         </div>
 
-        <p className="mt-2 text-sm font-semibold text-[var(--color-navy)]">{post.likesCount} likes</p>
+        <p className="text-sm font-semibold text-[var(--color-navy)] mb-1">
+          {post.likesCount ?? post.likedBy?.length ?? 0} likes
+        </p>
 
         {post.caption && (
-          <p className="mt-1 text-sm text-[var(--color-navy)]">
-            <Link to={`/users/${post.User?.username}`} className="font-semibold mr-1 hover:underline">
-              {post.User?.username}
-            </Link>
+          <p className="text-sm text-[var(--color-navy)]">
+            <span className="font-semibold mr-1.5">{post.User?.username}</span>
             {post.caption}
           </p>
         )}
 
-        <button onClick={() => openPost(post.id)} className="mt-1 block text-sm text-gray-400 cursor-pointer">
+        <button
+          onClick={() => openPost(post.id)}
+          className="text-xs text-gray-400 hover:text-gray-600 mt-2 block cursor-pointer"
+        >
           Lihat semua komentar
         </button>
       </div>

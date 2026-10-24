@@ -1,7 +1,9 @@
+'use client';
+
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { usePostModalStore } from '@/stores/postModalStore';
 import { usePost } from '@/hooks/usePosts';
 import { useCreateComment, useDeleteComment } from '@/hooks/useComments';
@@ -36,7 +38,7 @@ export function PostDetailModal() {
         ) : (
           <div className="flex flex-col max-h-[85vh]">
             <Link
-              to={`/users/${post.User?.username}`}
+              href={`/users/${post.User?.username}`}
               onClick={closePost}
               className="flex items-center gap-3 px-5 pt-5 pb-3 hover:opacity-85 transition-opacity"
             >
@@ -50,53 +52,55 @@ export function PostDetailModal() {
               </div>
             </Link>
 
-            {post.imageUrl && (
-              <img src={post.imageUrl} alt={post.caption ?? 'Post'} className="w-full max-h-[420px] object-cover" />
-            )}
+            <div className="flex-1 overflow-y-auto">
+              <div className="bg-black flex items-center justify-center max-h-[55vh]">
+                <img
+                  src={post.imageUrl}
+                  alt={post.caption}
+                  className="max-h-[55vh] w-auto object-contain"
+                />
+              </div>
 
-            <div className="flex items-center gap-4 px-5 pt-3">
-              <LikeButton key={post.id} postId={post.id} initialLiked={isLiked} size="lg" />
+              <div className="p-5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <LikeButton postId={post.id} initialLiked={isLiked} />
+                  </div>
+                  <span className="text-xs text-gray-400">{timeAgo(post.createdAt)} ago</span>
+                </div>
+
+                <p className="text-xs font-semibold text-[var(--color-navy)]">
+                  {post.likesCount ?? post.likedBy?.length ?? 0} likes
+                </p>
+
+                {post.caption && (
+                  <p className="text-sm text-[var(--color-navy)]">
+                    <span className="font-semibold mr-1.5">{post.User?.username}</span>
+                    {post.caption}
+                  </p>
+                )}
+
+                <div className="border-t border-gray-100 pt-3">
+                  <p className="text-xs font-medium text-gray-400 mb-2">Komentar</p>
+                  <div className="space-y-1">
+                    {post.Comments && post.Comments.length > 0 ? (
+                      post.Comments.map((comment) => (
+                        <CommentItem
+                          key={comment.id}
+                          comment={comment}
+                          onDelete={(id) => deleteComment.mutate(id)}
+                        />
+                      ))
+                    ) : (
+                      <p className="text-xs text-gray-400 py-3 text-center">Belum ada komentar.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <p className="px-5 pt-2 text-sm font-semibold text-[var(--color-navy)]">
-              {post.likesCount} likes
-              {post.likedBy && post.likedBy.length > 0 && (
-                <span className="ml-1 font-normal text-gray-400">
-                  · liked by {post.likedBy.map((u) => u.username).slice(0, 3).join(', ')}
-                  {post.likedBy.length > 3 ? ` and ${post.likedBy.length - 3} others` : ''}
-                </span>
-              )}
-            </p>
-
-            {post.caption && (
-              <p className="px-5 pt-2 text-sm text-[var(--color-navy)]">
-                <Link
-                  to={`/users/${post.User?.username}`}
-                  onClick={closePost}
-                  className="font-semibold mr-1 hover:underline"
-                >
-                  {post.User?.username}
-                </Link>
-                {post.caption}
-              </p>
-            )}
-            <p className="px-5 pt-1 text-xs uppercase text-gray-400">{timeAgo(post.createdAt)} ago</p>
-
-            <div className="mt-3 flex-1 overflow-y-auto px-5">
-              <p className="text-sm font-semibold text-[var(--color-navy)] mb-1">
-                Comments ({post.Comments?.length ?? 0})
-              </p>
-              {post.Comments && post.Comments.length > 0 ? (
-                post.Comments.map((comment) => (
-                  <CommentItem key={comment.id} comment={comment} onDelete={(id) => deleteComment.mutate(id)} />
-                ))
-              ) : (
-                <p className="py-4 text-center text-xs text-gray-400">Belum ada komentar. Jadilah yang pertama!</p>
-              )}
-            </div>
-
-            <div className="px-5 pb-5">
-              <CommentForm onSubmit={(msg) => createComment.mutate(msg)} isSubmitting={createComment.isPending} />
+            <div className="border-t border-gray-100 p-3 bg-white">
+              <CommentForm onSubmit={(msg) => createComment.mutate(msg)} />
             </div>
           </div>
         )}

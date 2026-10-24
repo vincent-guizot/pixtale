@@ -1,5 +1,8 @@
+'use client';
+
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import { UserCheck, UserPlus, ArrowLeft } from 'lucide-react';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { usePosts } from '@/hooks/usePosts';
@@ -14,7 +17,8 @@ import { PostGridItem } from '@/components/posts/PostGridItem';
 import { getInitials } from '@/lib/utils';
 
 export default function UserProfilePage() {
-  const { username } = useParams();
+  const params = useParams();
+  const username = params?.username;
   const currentUser = useAuthStore((state) => state.user);
   const toggleFollowMutation = useToggleFollow();
 
@@ -60,7 +64,7 @@ export default function UserProfilePage() {
           Akun dengan username "@{username}" mungkin telah dihapus atau belum pernah dibuat.
         </p>
         <Button asChild variant="outline">
-          <Link to="/">
+          <Link href="/">
             <ArrowLeft className="h-4 w-4 mr-2" /> Kembali ke Home
           </Link>
         </Button>

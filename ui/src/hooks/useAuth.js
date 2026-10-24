@@ -1,12 +1,14 @@
+'use client';
+
 import { useMutation } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { authApi } from '@/api/auth.api';
 import { getApiErrorMessage } from '@/api/axios';
 import { useAuthStore } from '@/stores/authStore';
 
 export function useLogin() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const setAuth = useAuthStore((s) => s.setAuth);
 
   return useMutation({
@@ -14,7 +16,7 @@ export function useLogin() {
     onSuccess: (data) => {
       setAuth(data.access_token, data.user);
       toast.success('Login berhasil! Selamat datang kembali 👋');
-      navigate('/');
+      router.push('/');
     },
     onError: (error) => {
       toast.error(getApiErrorMessage(error));
@@ -23,13 +25,13 @@ export function useLogin() {
 }
 
 export function useRegister() {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   return useMutation({
     mutationFn: (payload) => authApi.register(payload),
     onSuccess: () => {
       toast.success('Akun berhasil dibuat! Silakan login.');
-      navigate('/login');
+      router.push('/login');
     },
     onError: (error) => {
       toast.error(getApiErrorMessage(error));
@@ -38,12 +40,12 @@ export function useRegister() {
 }
 
 export function useLogout() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const clearAuth = useAuthStore((s) => s.clearAuth);
 
   return () => {
     clearAuth();
     toast.success('Berhasil logout');
-    navigate('/login');
+    router.push('/login');
   };
 }
